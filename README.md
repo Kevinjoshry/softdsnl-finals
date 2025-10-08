@@ -119,6 +119,7 @@ import pickle
 import numpy as np
 from tqdm import tqdm
 from glob import glob
+import csv
 
 import tensorflow as tf
 from tensorflow.keras.applications.inception_v3 import InceptionV3, preprocess_input
@@ -141,6 +142,17 @@ EMBED_DIM = 256
 MAX_WORDS = 10000
 MAX_LEN = 30
 # ----------------------------
+
+def load_captions_csv(fname):
+    captions_dict = {}
+    with open(fname, "r", encoding="utf8") as f:
+        reader = csv.DictReader(f)  # automatically handles header
+        for row in reader:
+            img_file = row['image'].strip()
+            caption = row['caption'].strip().lower()
+            if caption:  # skip empty captions
+                captions_dict.setdefault(img_file, []).append(caption)
+    return captions_dict
 
 # 1) Simple loader for captions.txt (Flickr8k format)
 # Assumes each line: "1000268201_693b08cb0e.jpg#0\tA child in a pink dress is climbing up a set of stairs in an entry way ."
